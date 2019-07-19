@@ -1,10 +1,10 @@
 # convert_tensor_record
 This code converts the images to tfrecord file.
 
-Step 1. Settings: OS-Ubuntu 16.04 
-The table below is anaconda envs package list to implement this code.
+# Step 1. Settings: OS-Ubuntu 16.04
 
-# Name                    Version                   Build  Channel
+The table below is anaconda envs package list to implement this code.
+Name                    Version                   Build  Channel
 _libgcc_mutex             0.1                        main  
 _tflow_select             2.1.0                       gpu  
 absl-py                   0.7.1                    py27_0  
@@ -56,7 +56,7 @@ werkzeug                  0.15.4                     py_0
 wheel                     0.33.4                   py27_0  
 zlib                      1.2.11               h7b6447c_3
 
-Step 2. Use
+# Step 2. Use
 python DataSetting.py --dataset_name=RAF --dataset_dir=your_save_directory_path --num_shard=5 --image_width=227 --image_height=227 --ratio_val=0.1 --label_file=your_label_file_path
 
 flag description:
