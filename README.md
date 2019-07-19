@@ -4,7 +4,9 @@ This code converts the images to tfrecord file.
 # Step 1. Settings: OS-Ubuntu 16.04
 
 The table below is anaconda envs package list to implement this code.
+
 Name                    Version                   Build  Channel
+
 _libgcc_mutex             0.1                        main  
 _tflow_select             2.1.0                       gpu  
 absl-py                   0.7.1                    py27_0  
