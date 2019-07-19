@@ -31,27 +31,14 @@ import math
 import os
 import random
 import sys
-
+import  shutil
 import tensorflow as tf
 
 import dataset_utils
 
 import cv2
 
-# # The URL where the Flowers data can be downloaded.
-# _DATA_URL = 'http://download.tensorflow.org/example_images/flower_photos.tgz'
-#
-# # The number of images in the validation set.
-# _NUM_VALIDATION = 350
-#
-# Seed for repeatability.
 _RANDOM_SEED = 0
-#
-# # The number of shards per dataset split.
-# _NUM_SHARDS = 5
-#
-# # The ratio of validation set in the data set.
-# _RATIO_VALIDATION = 0.1
 
 
 class ImageReader(object):
@@ -104,8 +91,8 @@ def _get_filenames_and_classes(dataset_dir):
 
 
 def _get_dataset_filename(dataset_name, dataset_dir, split_name, shard_id, num_shards):
-  output_filename = 'Expw_%s_%05d-of-%05d.tfrecord' % (
-      split_name, shard_id, num_shards)
+  output_filename = '%s_%s_%05d-of-%05d.tfrecord' % (
+      dataset_name, split_name, shard_id, num_shards)
   return os.path.join(dataset_dir, output_filename)
 
 
@@ -113,13 +100,13 @@ def _convert_dataset(dataset_name, split_name, filenames, class_names_to_ids, da
   """Converts the given filenames to a TFRecord dataset.
 
   Args:
-    split_name: The name of the dataset, either 'train' or 'validation'.
+    split_name: The name of the dataset, either 'train' or 'validation' or 'test'.
     filenames: A list of absolute paths to png or jpg images.
     class_names_to_ids: A dictionary from class names (strings) to ids
       (integers).
     dataset_dir: The directory where the converted datasets are stored.
   """
-  assert split_name in ['train', 'validation']
+  assert split_name in ['train', 'validation', 'test']
 
   num_per_shard = int(math.ceil(len(filenames) / float(num_shards)))
 
@@ -155,28 +142,13 @@ def _convert_dataset(dataset_name, split_name, filenames, class_names_to_ids, da
   sys.stdout.flush()
 
 
-# def _clean_up_temporary_files(dataset_dir):
-#   """Removes temporary files used to create the dataset.
-#
-#   Args:
-#     dataset_dir: The directory where the temporary files are stored.
-#   """
-#   filename = _DATA_URL.split('/')[-1]
-#   filepath = os.path.join(dataset_dir, filename)
-#   tf.gfile.Remove(filepath)
-#
-#   tmp_dir = os.path.join(dataset_dir, 'flower_photos')
-#   tf.gfile.DeleteRecursively(tmp_dir)
-
-
-def _dataset_exists(dataset_name, dataset_dir, num_shards):
-  for split_name in ['train', 'validation']:
+def _dataset_exists(dataset_name, dataset_dir, num_shards, split_name):
     for shard_id in range(num_shards):
       output_filename = _get_dataset_filename(
           dataset_name, dataset_dir, split_name, shard_id, num_shards)
       if not tf.gfile.Exists(output_filename):
         return False
-  return True
+    return True
 
 
 def _create_dir_and_copy_files(dataset_dir, label_file, resize_width, resize_height):
@@ -203,8 +175,19 @@ def _create_dir_and_copy_files(dataset_dir, label_file, resize_width, resize_hei
 
     return save_dir
 
+def _clean_up_temporary_files(dataset_dir):
+  """Removes temporary files used to create the dataset.
 
-def run(dataset_name, dataset_dir, num_shards, ratio_val, label_file, image_width, image_height):
+  Args:
+    dataset_dir: The directory where the temporary files are stored.
+  """
+  filepath = dataset_dir + '/images/'
+  print(filepath)
+  if os.path.exists(filepath):
+      shutil.rmtree(filepath)
+      print('remove directory: {}'.format(filepath))
+
+def run(dataset_name, dataset_dir, split_name, num_shards, label_file, image_width, image_height):
   """Runs the conversion operation.
 
   Args:
@@ -214,31 +197,22 @@ def run(dataset_name, dataset_dir, num_shards, ratio_val, label_file, image_widt
   if not tf.gfile.Exists(dataset_dir):
     tf.gfile.MakeDirs(dataset_dir)
 
-  if _dataset_exists(dataset_name, dataset_dir, num_shards):
+  if _dataset_exists(dataset_name, dataset_dir, num_shards, split_name):
     print('Dataset files already exist. Exiting without re-creating them.')
     return
 
-  root_dir = _create_dir_and_copy_files(dataset_dir, label_file, image_width, image_height)
+  _create_dir_and_copy_files(dataset_dir, label_file, image_width, image_height)
 
   photo_filenames, class_names = _get_filenames_and_classes(dataset_dir)
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
-  # Divide into train and test:
-  num_validation = int(len(photo_filenames) * ratio_val)
-  random.seed(_RANDOM_SEED)
-  random.shuffle(photo_filenames)
-  training_filenames = photo_filenames[num_validation:]
-  validation_filenames = photo_filenames[:num_validation]
-
   # First, convert the training and validation sets.
-  _convert_dataset(dataset_name, 'train', training_filenames, class_names_to_ids,
-                   dataset_dir, num_shards)
-  _convert_dataset(dataset_name, 'validation', validation_filenames, class_names_to_ids,
+  _convert_dataset(dataset_name, split_name, photo_filenames, class_names_to_ids,
                    dataset_dir, num_shards)
 
   # Finally, write the labels file:
   labels_to_class_names = dict(zip(range(len(class_names)), class_names))
   dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
 
-  # _clean_up_temporary_files(root_dir)
+  _clean_up_temporary_files(dataset_dir)
   print('\nFinished converting the dataset!')
