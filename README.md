@@ -1,5 +1,6 @@
 # convert_tensor_record
 This code converts the images to tfrecord file.
+referance site is https://github.com/tensorflow/models/tree/master/research/slim
 
 # Step 1. Settings: OS-Ubuntu 16.04
 
