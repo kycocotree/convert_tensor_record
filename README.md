@@ -71,6 +71,7 @@ ratio_val: A ratio of validation datasets for TFRecord files(flaot, 0 ~ 1).
 label_file: The path of the label file.
 
 label file sample:
+
 /media/kmc/2TB_HD/dataset/RAF/experiment/aligned/test_5classes/neutral/basic_test_2642_E0.jpg 0
 /media/kmc/2TB_HD/dataset/RAF/experiment/aligned/test_5classes/neutral/basic_test_2390_E0.jpg 0
 /media/kmc/2TB_HD/dataset/RAF/experiment/aligned/test_5classes/neutral/basic_test_2391_E0.jpg 0
