@@ -4,8 +4,10 @@ referance site is https://github.com/tensorflow/models/tree/master/research/slim
 
 # Step 1. Settings: OS-Ubuntu 16.04
 conda create -n tf-slim python=2.7 cudatoolkit=9.0 cudnn=7.3 tensorflow-gpu=1.10
+
 conda list
 ->
+
 _libgcc_mutex             0.1                        main  
 _tflow_select             2.1.0                       gpu  
 absl-py                   0.7.1                    py27_0  
@@ -84,6 +86,7 @@ wheel                     0.33.4                   py27_0
 xz                        5.2.4                h14c3975_4  
 zlib                      1.2.11               h7b6447c_3  
 zstd                      1.3.7                h0b5b093_0
+
 
 
 # Step 2. Use
